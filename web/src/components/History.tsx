@@ -89,16 +89,16 @@ function LogRow({ log }: { log: LogEntry }) {
         <TableCell>
           <StatusChip status={log.status} />
         </TableCell>
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>{log.project.name}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{log.project?.name || '-'}</TableCell>
         <TableCell>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            {log.task.time && <Chip size="small" label={log.task.time} variant="outlined" />}
-            <Chip size="small" label={getTaskLabel(log.task.action)} color="primary" />
+            {log.task?.time && <Chip size="small" label={log.task.time} variant="outlined" />}
+            <Chip size="small" label={getTaskLabel(log.task?.action || '')} color="primary" />
           </Box>
         </TableCell>
         <TableCell sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          <Tooltip title={log.message}>
-            <span>{log.message}</span>
+          <Tooltip title={log.message || ''}>
+            <span>{log.message || '-'}</span>
           </Tooltip>
         </TableCell>
         <TableCell sx={{ width: 40, p: 0 }}>

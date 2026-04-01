@@ -148,12 +148,34 @@ browser action=act kind=evaluate fn="() => { window.location.href = 'https://目
 | 狀態 | ⏸️ 暫停中（需登入瀏覽器後重新啟用） |
 
 ### Cron 執行邏輯
-1. 讀取 `schedule.json`
-2. 取得當前小時，找出符合時間的啟用任務
-3. 依任務類型執行：
-   - `generate` → AI 生成內容，存入 `generated-content.md`
-   - `publish` → 讀取生成內容，**依平台設定的 browser + browserProfile 開啟對應瀏覽器**，實際發佈
-4. 結果寫入 `logs.json`
+
+```
+每小時整點觸發：
+
+1. 讀取 schedule.json
+2. 取得當前日期時間（Asia/Taipei）
+3. 遍歷所有 enabled=true 的專案，判斷執行模式：
+
+   ┌─ runMode='daily'（或未設定）
+   │   → 比對當前小時，找出符合 task.time 的任務
+   │   → 依序執行 generate / publish
+   │
+   └─ runMode='once'
+       → 比對 scheduledAt 的日期+小時 == 當前日期+小時
+       → 若符合：執行所有任務
+       → 執行完成後：
+           - 將 project.enabled 設為 false
+           - 清除 project.scheduledAt
+           - 更新 schedule.json
+
+4. 任務執行：
+   - generate → AI 搜尋新聞並生成內容，存入 today-content.md
+   - publish  → 讀取 today-content.md，使用平台設定的
+                browser + browserProfile 開啟瀏覽器，
+                使用 evaluate 方法繞過 SSRF，發佈到對應平台
+
+5. 結果寫入 logs.json（記錄執行模式、是否一次性、是否已停用）
+```
 
 ---
 
@@ -167,14 +189,28 @@ browser action=act kind=evaluate fn="() => { window.location.href = 'https://目
 
 ---
 
+## 📋 專案執行模式
+
+| 模式 | 說明 |
+|------|------|
+| `daily` | 每日執行（預設），依照任務設定的時間執行 |
+| `once` | 一次性執行，指定日期時間後執行一次，**執行完成自動停用專案** |
+
+### 一次性執行流程
+
+1. 編輯專案 → 選擇「一次性執行」→ 設定日期時間
+2. Cron 每小時檢查：若 `runMode='once'` 且 `scheduledAt` 等於當前時間 → 執行任務
+3. 執行完成後 → 自動將 `enabled` 設為 `false`
+4. 寫入 `logs.json` 記錄執行結果
+
+---
+
 ## 📋 任務欄位
 
 | 欄位 | 說明 |
 |------|------|
 | `time` | 執行時間（HH:MM） |
 | `action` | 任務類型：`search` / `generate` / `publish` 或自訂 |
-| `daily` | 每日執行（預設 true） |
-| `scheduledAt` | 指定日期時間（daily=false 時） |
 | `description` | 任務描述（AI 執行依據） |
 | `enabled` | 是否啟用 |
 
@@ -212,4 +248,4 @@ browser action=act kind=evaluate fn="() => { window.location.href = 'https://目
 
 ---
 
-*最後更新：2026-03-31*
+*最後更新：2026-04-01*

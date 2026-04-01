@@ -41,6 +41,13 @@ export const translations = {
     editProject: '編輯專案',
     deleteProject: '刪除專案',
     
+    // 執行模式
+    runMode: '執行模式',
+    dailyMode: '每日執行',
+    onceMode: '一次性執行',
+    scheduledDate: '執行日期時間',
+    onceModeHint: '一次性執行：執行完成後自動停用專案',
+    
     // 任務
     task: '任務',
     tasks: '任務列表',
@@ -117,6 +124,8 @@ export const translations = {
     loading: '加载中...',
     saved: '已保存',
     noData: '无数据',
+    hour: '时',
+    minute: '分',
     
     // 导航
     schedule: '排程管理',
@@ -140,6 +149,13 @@ export const translations = {
     addProject: '新增项目',
     editProject: '编辑项目',
     deleteProject: '删除项目',
+    
+    // 执行模式
+    runMode: '执行模式',
+    dailyMode: '每日执行',
+    onceMode: '一次性执行',
+    scheduledDate: '执行日期时间',
+    onceModeHint: '一次性执行：执行完成后自动停用项目',
     
     // 任务
     task: '任务',
@@ -199,8 +215,6 @@ export const translations = {
     dailyExecution: '每日执行：开启后每天固定时间执行，隐藏日期选择',
     enableDescription: '启用：开启后此任务才会被排程执行',
     scheduledAt: '指定日期时间',
-    hour: '时',
-    minute: '分',
   },
   
   'en': {
@@ -219,6 +233,8 @@ export const translations = {
     loading: 'Loading...',
     saved: 'Saved',
     noData: 'No Data',
+    hour: 'Hour',
+    minute: 'Min',
     
     // Navigation
     schedule: 'Schedule',
@@ -242,6 +258,13 @@ export const translations = {
     addProject: 'Add Project',
     editProject: 'Edit Project',
     deleteProject: 'Delete Project',
+    
+    // Run Mode
+    runMode: 'Run Mode',
+    dailyMode: 'Daily',
+    onceMode: 'One-time',
+    scheduledDate: 'Scheduled Date & Time',
+    onceModeHint: 'One-time: Project will be disabled after execution',
     
     // Task
     task: 'Task',
@@ -301,8 +324,6 @@ export const translations = {
     dailyExecution: 'Daily Execution: When enabled, runs at fixed time daily and hides date picker',
     enableDescription: 'Enable: When enabled, this task will be scheduled to run',
     scheduledAt: 'Scheduled At',
-    hour: 'Hour',
-    minute: 'Min',
   }
 } as const
 

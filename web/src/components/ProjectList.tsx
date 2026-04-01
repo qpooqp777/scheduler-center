@@ -28,6 +28,9 @@ import {
   TableRow,
   Autocomplete,
   FormControlLabel,
+  ToggleButtonGroup,
+  ToggleButton,
+  Divider,
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -39,6 +42,7 @@ import {
   Send as PublishIcon,
   Today as DailyIcon,
   Event as ScheduledIcon,
+  Replay as OnceIcon,
 } from '@mui/icons-material'
 import { useI18n } from '../i18n'
 import { Project, Group, Task } from '../types'
@@ -81,6 +85,8 @@ export default function ProjectList({ projects, groups, onAdd, onEdit, onDelete,
   const [name, setName] = useState('')
   const [groupId, setGroupId] = useState('')
   const [tasks, setTasks] = useState<Omit<Task, 'id'>[]>([])
+  const [runMode, setRunMode] = useState<'daily' | 'once'>('daily')
+  const [scheduledAt, setScheduledAt] = useState('')
 
   const openDialog = (project?: Project) => {
     if (project) {
@@ -88,11 +94,15 @@ export default function ProjectList({ projects, groups, onAdd, onEdit, onDelete,
       setName(project.name)
       setGroupId(project.groupId)
       setTasks(project.tasks.map(({ id: _id, ...rest }) => rest))
+      setRunMode(project.runMode || 'daily')
+      setScheduledAt(project.scheduledAt || '')
     } else {
       setEditingProject(null)
       setName('')
       setGroupId(groups[0]?.id || '')
       setTasks([])
+      setRunMode('daily')
+      setScheduledAt('')
     }
     setDialogOpen(true)
   }
@@ -103,6 +113,8 @@ export default function ProjectList({ projects, groups, onAdd, onEdit, onDelete,
     setName('')
     setGroupId('')
     setTasks([])
+    setRunMode('daily')
+    setScheduledAt('')
   }
 
   const handleSave = () => {
@@ -112,9 +124,23 @@ export default function ProjectList({ projects, groups, onAdd, onEdit, onDelete,
       id: editingProject?.tasks[i]?.id || `t_${Date.now()}_${i}`,
     }))
     if (editingProject) {
-      onEdit({ ...editingProject, name, groupId, tasks: fullTasks })
+      onEdit({ 
+        ...editingProject, 
+        name, 
+        groupId, 
+        tasks: fullTasks,
+        runMode,
+        scheduledAt: runMode === 'once' ? scheduledAt : undefined,
+      })
     } else {
-      onAdd({ name, groupId, tasks: fullTasks, enabled: true })
+      onAdd({ 
+        name, 
+        groupId, 
+        tasks: fullTasks, 
+        enabled: true,
+        runMode,
+        scheduledAt: runMode === 'once' ? scheduledAt : undefined,
+      })
     }
     closeDialog()
   }
@@ -162,7 +188,27 @@ export default function ProjectList({ projects, groups, onAdd, onEdit, onDelete,
                 />
                 <Typography sx={{ fontWeight: 500, flexShrink: 0 }}>{project.name}</Typography>
                 <Chip size="small" label={getGroupName(project.groupId)} variant="outlined" />
-                <Chip size="small" label={`${project.tasks.length} ${t('tasks')}`} color="primary" variant="outlined" />
+                <Chip 
+                  size="small" 
+                  label={`${project.tasks.length} ${t('tasks')}`} 
+                  color="primary" 
+                  variant="outlined" 
+                />
+                {/* 執行模式標籤 */}
+                {project.runMode === 'once' && project.scheduledAt && (
+                  <Chip
+                    size="small"
+                    icon={<OnceIcon />}
+                    label={new Date(project.scheduledAt).toLocaleString('zh-TW', {
+                      month: 'numeric',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                    color="warning"
+                    variant="outlined"
+                  />
+                )}
               </Box>
               <Box sx={{ display: 'flex', gap: 0.5, mr: 1, flexShrink: 0 }}>
                 <Tooltip title={t('edit')}>
@@ -232,7 +278,7 @@ export default function ProjectList({ projects, groups, onAdd, onEdit, onDelete,
         <DialogTitle>{editingProject ? t('editProject') : t('addProject')}</DialogTitle>
         <DialogContent>
           {/* 專案名稱 + 群組 */}
-          <Box sx={{ display: 'flex', gap: 2, mt: 1, mb: 3 }}>
+          <Box sx={{ display: 'flex', gap: 2, mt: 1, mb: 2 }}>
             <TextField
               label={t('projectName')}
               fullWidth
@@ -253,6 +299,46 @@ export default function ProjectList({ projects, groups, onAdd, onEdit, onDelete,
               </Select>
             </FormControl>
           </Box>
+
+          {/* 執行模式 */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>{t('runMode')}</Typography>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+              <ToggleButtonGroup
+                value={runMode}
+                exclusive
+                onChange={(_, val) => val && setRunMode(val)}
+                size="small"
+              >
+                <ToggleButton value="daily">
+                  <DailyIcon sx={{ mr: 0.5 }} fontSize="small" />
+                  {t('dailyMode')}
+                </ToggleButton>
+                <ToggleButton value="once">
+                  <OnceIcon sx={{ mr: 0.5 }} fontSize="small" />
+                  {t('onceMode')}
+                </ToggleButton>
+              </ToggleButtonGroup>
+              {runMode === 'once' && (
+                <TextField
+                  type="datetime-local"
+                  label={t('scheduledDate')}
+                  size="small"
+                  value={scheduledAt}
+                  onChange={(e) => setScheduledAt(e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ minWidth: 220 }}
+                />
+              )}
+            </Box>
+            {runMode === 'once' && (
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {t('onceModeHint')}
+              </Typography>
+            )}
+          </Box>
+
+          <Divider sx={{ mb: 2 }} />
 
           {/* 任務標題 */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>

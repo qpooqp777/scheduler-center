@@ -31,7 +31,7 @@
           "name": "FB",
           "url": "https://www.facebook.com/profile.php?id=61575425402137",
           "browser": "chrome",
-          "browserProfile": "職業安全"
+          "browserProfile": "openclaw"
         }
       ],
       "id": "g_1774941017205"
@@ -47,8 +47,6 @@
           "action": "✍️ 生成",
           "description": "近一年的 勞工安全 相關新聞 一則 網址,針對該事件內容 做出改善說明300字.",
           "enabled": true,
-          "daily": true,
-          "scheduledAt": "",
           "id": "t_1775010980870_0"
         },
         {
@@ -59,9 +57,10 @@
           "id": "t_1775011828524_1"
         }
       ],
-      "enabled": true,
+      "enabled": false,
+      "runMode": "daily",
       "id": "p_1775010189571"
     }
   ],
-  "lastUpdated": "2026-04-01T05:13:54.144Z"
+  "lastUpdated": "2026-04-01T05:48:13.116Z"
 }

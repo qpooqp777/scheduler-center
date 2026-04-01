@@ -25,6 +25,8 @@ export interface Project {
   groupId: string
   tasks: Task[]
   enabled: boolean
+  runMode?: 'daily' | 'once'      // 執行模式：每日(預設) 或 一次性
+  scheduledAt?: string            // 一次性執行日期時間 (ISO 格式，e.g. "2026-04-01T15:00")
 }
 
 export interface ScheduleData {

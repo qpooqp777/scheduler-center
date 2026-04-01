@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenClaw - 任務歷史紀錄</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');
+    :root {
+      --bg: #0a0a0f; --card: #12121a; --accent: #00d4ff; --accent2: #ff6b6b; --accent3: #feca57;
+      --text: #e8e8e8; --dim: #666; --border: #222; --success: #51cf66; --fail: #ff6b6b;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 30px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .back-btn {
+      padding: 8px 16px;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .back-btn:hover { background: var(--accent); color: #000; }
+    .header h1 { font-size: 20px; font-weight: 700; background: linear-gradient(135deg, var(--accent), #7b68ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .header-right { display: flex; gap: 10px; }
+    
+    /* Search */
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      padding: 16px 30px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+    }
+    .search-input {
+      flex: 1;
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+    }
+    .search-input:focus { outline: none; border-color: var(--accent); }
+    .filter-select {
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      min-width: 120px;
+    }
+    .filter-select:focus { outline: none; border-color: var(--accent); }
+    
+    /* Stats */
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      padding: 16px 30px;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+    }
+    .stat-box {
+      padding: 12px 20px;
+      background: var(--card);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .stat-icon { font-size: 20px; }
+    .stat-info {}
+    .stat-num { font-family: 'Space Mono'; font-size: 18px; font-weight: 700; }
+    .stat-num.success { color: var(--success); }
+    .stat-num.fail { color: var(--fail); }
+    .stat-num.total { color: var(--accent); }
+    .stat-lbl { font-size: 11px; color: var(--dim); }
+    
+    /* Log List */
+    .log-container { padding: 20px 30px; max-height: calc(100vh - 200px); overflow-y: auto; }
+    .log-list { display: flex; flex-direction: column; gap: 12px; }
+    
+    .log-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .log-item:hover { border-color: var(--accent); }
+    
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+    }
+    .log-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .status-badge.success { background: rgba(81,207,102,0.2); color: var(--success); }
+    .status-badge.fail { background: rgba(255,107,107,0.2); color: var(--fail); }
+    .log-time { font-family: 'Space Mono'; font-size: 11px; color: var(--dim); }
+    
+    .log-body { padding: 14px 16px; }
+    .log-project { font-weight: 700; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .log-project .proj-name { color: var(--accent); }
+    .log-task { font-size: 13px; color: var(--text); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .log-task-time { font-family: 'Space Mono'; font-size: 11px; color: var(--accent); background: rgba(0,212,255,0.1); padding: 2px 8px; border-radius: 4px; }
+    .log-message { font-size: 12px; color: var(--dim); padding: 10px 12px; background: rgba(255,255,255,0.02); border-radius: 8px; line-height: 1.5; }
+    .log-message.error { background: rgba(255,107,107,0.1); color: var(--fail); }
+    .log-message.success { background: rgba(81,207,102,0.1); color: var(--success); }
+    
+    /* Empty */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--dim); }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-text { font-size: 14px; }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 16px;
+      background: var(--card);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      font-size: 12px;
+      box-shadow: 0 0 20px rgba(0,212,255,0.25);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 2000;
+    }
+    .toast.on { transform: translateY(0); opacity: 1; }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.5); }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header { flex-direction: column; gap: 12px; padding: 16px; }
+      .search-bar { flex-direction: column; padding: 12px 16px; }
+      .stats-row { flex-wrap: wrap; padding: 12px 16px; }
+      .log-container { padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-left">
+      <a href="index.html" class="back-btn">← 返回排程</a>
+      <h1>📋 任務歷史紀錄</h1>
+    </div>
+    <div class="header-right">
+      <button class="back-btn" onclick="refreshLogs()" style="background: rgba(81,207,102,0.1); border-color: var(--success); color: var(--success);">🔄 重新整理</button>
+    </div>
+  </div>
+  
+  <div class="search-bar">
+    <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜尋任務、專案、錯誤訊息..." oninput="filterLogs()">
+    <select class="filter-select" id="filterStatus" onchange="filterLogs()">
+      <option value="">全部狀態</option>
+      <option value="success">✅ 成功</option>
+      <option value="fail">❌ 失敗</option>
+    </select>
+    <select class="filter-select" id="filterProject" onchange="filterLogs()">
+      <option value="">全部專案</option>
+    </select>
+  </div>
+  
+  <div class="stats-row">
+    <div class="stat-box">
+      <span class="stat-icon">📊</span>
+      <div class="stat-info">
+        <div class="stat-num total" id="statTotal">0</div>
+        <div class="stat-lbl">總記錄</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <span class="stat-icon">✅</span>
+      <div class="stat-info">
+        <div class="stat-num success" id="statSuccess">0</div>
+        <div class="stat-lbl">成功</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <span class="stat-icon">❌</span>
+      <div class="stat-info">
+        <div class="stat-num fail" id="statFail">0</div>
+        <div class="stat-lbl">失敗</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="log-container">
+    <div class="log-list" id="logList"></div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+  
+  <script>
+    var LOG_KEY = 'openclaw_logs_v1';
+    var logs = [];
+    
+    function loadLogs() {
+      // 優先從 localStorage
+      var stored = localStorage.getItem(LOG_KEY);
+      if (stored) {
+        try {
+          logs = JSON.parse(stored);
+          loadProjectFilter();
+          filterLogs();
+          return;
+        } catch(e) {}
+      }
+      // 嘗試讀取 JSON 檔案
+      fetch('../data/logs.json')
+        .then(function(r) { return r.json(); })
+        .then(function(json) {
+          logs = json.logs || [];
+          localStorage.setItem(LOG_KEY, JSON.stringify(logs));
+          loadProjectFilter();
+          filterLogs();
+        })
+        .catch(function() {
+          logs = getSampleLogs();
+          localStorage.setItem(LOG_KEY, JSON.stringify(logs));
+          loadProjectFilter();
+          filterLogs();
+        });
+    }
+    
+    function getSampleLogs() {
+      return [
+        {
+          id: 'log_1',
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          status: 'success',
+          project: { id: 'p_1', name: 'OpenClaw 每日懶人包' },
+          task: { id: 't_1', time: '09:00', action: 'search', description: '搜尋 OpenClaw 相關新聞' },
+          message: '成功搜尋到 15 篇相關新聞'
+        },
+        {
+          id: 'log_2',
+          timestamp: new Date(Date.now() - 3540000).toISOString(),
+          status: 'success',
+          project: { id: 'p_1', name: 'OpenClaw 每日懶人包' },
+          task: { id: 't_2', time: '09:10', action: 'generate', description: 'AI 生成原創懶人包' },
+          message: '成功生成懶人包內容，共 5 個重點'
+        },
+        {
+          id: 'log_3',
+          timestamp: new Date(Date.now() - 3480000).toISOString(),
+          status: 'success',
+          project: { id: 'p_1', name: 'OpenClaw 每日懶人包' },
+          task: { id: 't_3', time: '09:20', action: 'publish', description: '自動發佈到 Facebook' },
+          message: '成功發佈到 Facebook 粉絲專頁'
+        },
+        {
+          id: 'log_4',
+          timestamp: new Date(Date.now() - 2400000).toISOString(),
+          status: 'success',
+          project: { id: 'p_2', name: 'OpenClaw 搞笑對白' },
+          task: { id: 't_4', time: '10:00', action: 'search', description: '自創 AI 搞笑對白素材' },
+          message: '成功收集 8 個搞笑素材'
+        },
+        {
+          id: 'log_5',
+          timestamp: new Date(Date.now() - 2340000).toISOString(),
+          status: 'fail',
+          project: { id: 'p_2', name: 'OpenClaw 搞笑對白' },
+          task: { id: 't_5', time: '10:10', action: 'generate', description: '生成搞笑對話內容' },
+          message: '生成失敗：內容長度超過限制'
+        }
+      ];
+    }
+    
+    function loadProjectFilter() {
+      var projects = {};
+      for (var i = 0; i < logs.length; i++) {
+        var p = logs[i].project;
+        if (p && p.id) projects[p.id] = p.name;
+      }
+      var opts = '<option value="">全部專案</option>';
+      for (var id in projects) {
+        opts += '<option value="' + id + '">' + escHtml(projects[id]) + '</option>';
+      }
+      document.getElementById('filterProject').innerHTML = opts;
+    }
+    
+    function filterLogs() {
+      var keyword = document.getElementById('searchInput').value.toLowerCase();
+      var status = document.getElementById('filterStatus').value;
+      var projectId = document.getElementById('filterProject').value;
+      
+      var filtered = [];
+      for (var i = 0; i < logs.length; i++) {
+        var log = logs[i];
+        
+        // Status filter
+        if (status && log.status !== status) continue;
+        
+        // Project filter
+        if (projectId && log.project && log.project.id !== projectId) continue;
+        
+        // Keyword filter
+        if (keyword) {
+          var searchable = [
+            log.message || '',
+            log.project ? log.project.name : '',
+            log.task ? log.task.description : ''
+          ].join(' ').toLowerCase();
+          if (searchable.indexOf(keyword) === -1) continue;
+        }
+        
+        filtered.push(log);
+      }
+      
+      renderLogs(filtered);
+      updateStats(filtered);
+    }
+    
+    function renderLogs(filteredLogs) {
+      var el = document.getElementById('logList');
+      
+      if (!filteredLogs.length) {
+        el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">沒有找到符合條件的紀錄</div></div>';
+        return;
+      }
+      
+      var html = '';
+      for (var i = 0; i < filteredLogs.length; i++) {
+        var log = filteredLogs[i];
+        var date = new Date(log.timestamp);
+        var timeStr = date.toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        var statusClass = log.status === 'success' ? 'success' : 'fail';
+        var statusText = log.status === 'success' ? '✅ 成功' : '❌ 失敗';
+        var msgClass = log.status === 'success' ? 'success' : 'error';
+        var actionIcon = log.task && log.task.action === 'search' ? '🔍' : log.task && log.task.action === 'generate' ? '✍️' : '📢';
+        
+        html += '<div class="log-item">' +
+          '<div class="log-header">' +
+            '<div class="log-status">' +
+              '<span class="status-badge ' + statusClass + '">' + statusText + '</span>' +
+              '<span class="log-time">' + timeStr + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="log-body">' +
+            '<div class="log-project">📋 <span class="proj-name">' + escHtml(log.project ? log.project.name : '未知專案') + '</span></div>' +
+            '<div class="log-task">';
+        
+        if (log.task) {
+          html += '<span class="log-task-time">' + actionIcon + ' ' + log.task.time + '</span>' +
+            '<span>' + escHtml(log.task.description) + '</span>';
+        }
+        
+        html += '</div>' +
+          '<div class="log-message ' + msgClass + '">' + escHtml(log.message || '無訊息') + '</div>' +
+        '</div></div>';
+      }
+      
+      el.innerHTML = html;
+    }
+    
+    function updateStats(filteredLogs) {
+      var total = filteredLogs.length;
+      var success = 0;
+      var fail = 0;
+      for (var i = 0; i < filteredLogs.length; i++) {
+        if (filteredLogs[i].status === 'success') success++;
+        else fail++;
+      }
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statSuccess').textContent = success;
+      document.getElementById('statFail').textContent = fail;
+    }
+    
+    function refreshLogs() {
+      fetch('../data/logs.json')
+        .then(function(r) { return r.json(); })
+        .then(function(json) {
+          logs = json.logs || [];
+          localStorage.setItem(LOG_KEY, JSON.stringify(logs));
+          loadProjectFilter();
+          filterLogs();
+          toast('✅ 已重新整理');
+        })
+        .catch(function() {
+          toast('⚠️ 無法讀取 web/../data/../data/logs.json');
+        });
+    }
+    
+    function escHtml(s) {
+      if (!s) return '';
+      var div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+    
+    function toast(msg) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('on');
+      setTimeout(function() { t.classList.remove('on'); }, 2000);
+    }
+    
+    // Init
+    loadLogs();
+  </script>
+</body>
+</html>

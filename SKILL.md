@@ -227,17 +227,6 @@ browser action=act kind=evaluate fn="() => { window.location.href = 'https://目
 
 ---
 
-## 🔗 已設定帳號
-
-| 群組 | 平台 | 帳號/連結 | 瀏覽器設定檔 |
-|------|------|---------|------------|
-| ai養蝦 | Facebook | https://www.facebook.com/profile.php?id=61577400914049 | chrome / Default |
-| ai養蝦 | Threads | https://www.threads.com/ | *(待設定)* |
-| ai養蝦 | X | https://x.com/Shino_X1 | *(待設定)* |
-| 勞工職業安全 | FB | https://www.facebook.com/profile.php?id=61575425402137 | chrome / vivian |
-
----
-
 ## 📌 注意事項
 
 1. 時區統一使用 **Asia/Taipei**

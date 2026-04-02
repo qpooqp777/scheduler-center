@@ -74,7 +74,7 @@ export const translations = {
     searchPlatform: '搜尋平台',
     noPlatforms: '尚無平台',
     browserPlaceholder: 'chrome / firefox / safari / edge',
-    browserProfilePlaceholder: 'Default / Profile 1 / user',
+    browserProfilePlaceholder: 'openclaw / user / chrome-relay',
     
     // 歷史紀錄
     timestamp: '時間',
@@ -183,7 +183,7 @@ export const translations = {
     searchPlatform: '搜索平台',
     noPlatforms: '暂无平台',
     browserPlaceholder: 'chrome / firefox / safari / edge',
-    browserProfilePlaceholder: 'Default / Profile 1 / user',
+    browserProfilePlaceholder: 'openclaw / user / chrome-relay',
     
     // 历史记录
     timestamp: '时间',
@@ -292,7 +292,7 @@ export const translations = {
     searchPlatform: 'Search Platforms',
     noPlatforms: 'No platforms yet',
     browserPlaceholder: 'chrome / firefox / safari / edge',
-    browserProfilePlaceholder: 'Default / Profile 1 / user',
+    browserProfilePlaceholder: 'openclaw / user / chrome-relay',
     
     // History
     timestamp: 'Time',

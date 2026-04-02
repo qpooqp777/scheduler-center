@@ -46,22 +46,22 @@ interface FlatPlatform extends Platform {
 }
 
 const BROWSER_OPTIONS = ['chrome', 'firefox', 'safari', 'edge', 'brave', 'arc']
-const PROFILE_OPTIONS = ['Default', 'Profile 1', 'Profile 2', 'user', 'Work', 'Personal']
+const PROFILE_OPTIONS = ['openclaw', 'user', 'chrome-relay']
 
 const PLATFORM_PRESETS = [
-  { name: 'Facebook', url: 'https://www.facebook.com/', browser: 'chrome', browserProfile: 'Default' },
-  { name: 'Threads', url: 'https://www.threads.com/', browser: 'chrome', browserProfile: 'Default' },
-  { name: 'X (Twitter)', url: 'https://x.com/', browser: 'chrome', browserProfile: 'Default' },
-  { name: 'Instagram', url: 'https://www.instagram.com/', browser: 'chrome', browserProfile: 'Default' },
-  { name: 'LinkedIn', url: 'https://www.linkedin.com/', browser: 'chrome', browserProfile: 'Default' },
-  { name: 'YouTube', url: 'https://www.youtube.com/', browser: 'chrome', browserProfile: 'Default' },
+  { name: 'Facebook', url: 'https://www.facebook.com/', browser: 'chrome', browserProfile: 'openclaw' },
+  { name: 'Threads', url: 'https://www.threads.com/', browser: 'chrome', browserProfile: 'openclaw' },
+  { name: 'X (Twitter)', url: 'https://x.com/', browser: 'chrome', browserProfile: 'openclaw' },
+  { name: 'Instagram', url: 'https://www.instagram.com/', browser: 'chrome', browserProfile: 'openclaw' },
+  { name: 'LinkedIn', url: 'https://www.linkedin.com/', browser: 'chrome', browserProfile: 'openclaw' },
+  { name: 'YouTube', url: 'https://www.youtube.com/', browser: 'chrome', browserProfile: 'openclaw' },
 ]
 
 const emptyPlatform = (): Platform => ({
   name: '',
   url: '',
   browser: 'chrome',
-  browserProfile: 'Default',
+  browserProfile: 'openclaw',
 })
 
 export default function PlatformManager({ groups, onSaveGroups }: PlatformManagerProps) {
@@ -111,7 +111,7 @@ export default function PlatformManager({ groups, onSaveGroups }: PlatformManage
 
   const openEdit = (p: FlatPlatform) => {
     setEditing(p)
-    setForm({ name: p.name, url: p.url, browser: p.browser || 'chrome', browserProfile: p.browserProfile || 'Default' })
+    setForm({ name: p.name, url: p.url, browser: p.browser || 'chrome', browserProfile: p.browserProfile || 'openclaw' })
     setTargetGroupId(p.groupId)
     setDialogOpen(true)
   }

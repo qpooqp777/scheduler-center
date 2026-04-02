@@ -2,7 +2,7 @@ export interface Platform {
   name: string
   url: string
   browser?: string        // 使用瀏覽器（e.g. chrome, firefox, safari, edge）
-  browserProfile?: string // 瀏覽器設定檔名稱（e.g. Default, Profile 1, user）
+  browserProfile?: string // 瀏覽器設定檔名稱（e.g. openclaw, user, chrome-relay）
 }
 
 export interface Group {
